@@ -20,6 +20,7 @@ class AuthService extends ChangeNotifier {
   }
 
   Future<bool> sendVerifyCode({required String code}) async {
+    _context?.mounted;
     logServer('Отправка кода авторизации: $code');
     logServer('Адрес сервера ${getRoute('/verify')}');
     try {
