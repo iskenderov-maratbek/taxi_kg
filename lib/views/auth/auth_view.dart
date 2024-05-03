@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:taxi_kg/views/forms/text_field_form.dart';
-import 'package:taxi_kg/views/auth/pin_code_view.dart';
-import 'package:taxi_kg/views/misc/dialog_forms.dart';
 import 'package:taxi_kg/views/misc/misc_methods.dart';
-import 'package:taxi_kg/views/auth/view_builder.dart';
+import 'package:taxi_kg/views/view_builder.dart';
 import 'package:taxi_kg/views/forms/segmented_form.dart';
 import 'package:taxi_kg/services/validator_service.dart';
 import 'package:taxi_kg/services/auth_service.dart';
@@ -80,27 +78,35 @@ class _AuthState extends State<Auth> {
   }
 
   login() async {
+    logInfo('Выбранное меню: $_segmentedIndex');
     switch (_segmentedIndex) {
       case 0:
-        logInfo('Выбранное меню: $_segmentedIndex');
         _emailKey.currentState!.validate()
-            ? DialogForms.showLoaderOverlay(
-                context: context,
-                run: () async {
-                  if (await authService.login(email: _emailController.text)) {
-                    mounted
-                        ? Navigator.pushNamedAndRemoveUntil(
-                            context,
-                            '/home',
-                            (Route<dynamic> route) => false,
-                          )
-                        : null;
-                  }
-                })
+            ? await authService.loginWithEmail(email: _emailController.text)
             : null;
       case 1:
-        await showPinCodeDialog(context);
-      default:
+        _phoneNumberKey.currentState!.validate()
+            ? await authService.loginWithNumber(
+                number: _phoneNumberController.text)
+            : null;
+      //     ? DialogForms.showLoaderOverlay(
+      //         context: context,
+      //         run: () async {
+      //           if (await authService.login(
+      //                   number: _phoneNumberController.text) &&
+      //               mounted) {
+      //             if (await showPinCodeDialog(context)) {
+      //               mounted
+      //                   ? Navigator.pushNamedAndRemoveUntil(
+      //                       context,
+      //                       '/home',
+      //                       (Route<dynamic> route) => false,
+      //                     )
+      //                   : null;
+      //             }
+      //           } else {}
+      //         })
+      //     : null;
     }
   }
 

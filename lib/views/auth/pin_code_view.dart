@@ -1,6 +1,9 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:taxi_kg/services/auth_service.dart';
 import 'package:taxi_kg/views/forms/pin_code_form.dart';
+import 'package:taxi_kg/views/misc/misc_methods.dart';
 
 Future<bool> showPinCodeDialog(context) async {
   return await showDialog(
@@ -21,23 +24,23 @@ class PinCodeDialog extends StatefulWidget {
 
 class _PinCodeDialogState extends State<PinCodeDialog> {
   final formKey = GlobalKey<FormState>();
-  final TextEditingController pinCodeCoontroller = TextEditingController();
+  final TextEditingController _pinCodeController = TextEditingController();
 
   @override
   void dispose() {
-    pinCodeCoontroller.dispose();
+    _pinCodeController.dispose();
     super.dispose();
   }
 
   String? validator(String? value) {
     if (value != null && value.isNotEmpty && value.length == 4) {
-      if (value == '0012') {
+      if (value.length == 4) {
         return null;
       } else {
-        return 'Неверный код!';
+        return 'Заполните поле!';
       }
     }
-    return 'Неверный код!';
+    return 'Заполните поле!';
   }
 
   @override
@@ -74,7 +77,7 @@ class _PinCodeDialogState extends State<PinCodeDialog> {
                     const SizedBox(height: 15),
                     PinCodeForm(
                       validator: validator,
-                      controller: pinCodeCoontroller,
+                      controller: _pinCodeController,
                     ),
                     const SizedBox(height: 15),
                     ElevatedButton(
@@ -83,10 +86,18 @@ class _PinCodeDialogState extends State<PinCodeDialog> {
                           20,
                         ),
                       ),
-                      onPressed: () {
+                      onPressed: () async {
                         FocusManager.instance.primaryFocus?.unfocus();
                         if (formKey.currentState!.validate()) {
-                          Navigator.pop(context, true);
+                          if (await Provider.of<AuthService>(context,
+                                  listen: false)
+                              .sendVerifyCode(code: _pinCodeController.text)) {
+                            context.mounted
+                                ? Navigator.pop(context, true)
+                                : null;
+                          } else {
+                            logError('НЕВЕРНЫЙ КОД');
+                          }
                         }
                       },
                       child: const Text(

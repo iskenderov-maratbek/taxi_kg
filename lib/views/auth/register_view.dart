@@ -7,7 +7,7 @@ import 'package:taxi_kg/views/forms/text_field_form.dart';
 import 'package:taxi_kg/views/auth/pin_code_view.dart';
 import 'package:taxi_kg/views/misc/dialog_forms.dart';
 import 'package:taxi_kg/views/misc/misc_methods.dart';
-import 'package:taxi_kg/views/auth/view_builder.dart';
+import 'package:taxi_kg/views/view_builder.dart';
 import 'package:taxi_kg/services/auth_service.dart';
 
 class Register extends StatefulWidget {
@@ -85,7 +85,10 @@ class _RegisterState extends State<Register> {
             context: context,
             run: () async {
               if (_emailKey.currentState!.validate() && mounted) {
-                await authService.login(email: _emailController.text) && mounted
+                await authService.register(
+                            email: _emailController.text,
+                            username: _usernameController.text) &&
+                        mounted
                     ? Navigator.pushNamedAndRemoveUntil(
                         context,
                         '/home',

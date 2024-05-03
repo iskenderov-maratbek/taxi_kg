@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:taxi_kg/views/misc/custom_input_border.dart';
 import 'package:taxi_kg/views/misc/custom_transition.dart';
 import 'package:taxi_kg/views/auth/auth_view.dart';
 import 'package:taxi_kg/views/auth/register_view.dart';
@@ -12,19 +13,19 @@ Future<void> main() async {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => AuthService()),
+        ChangeNotifierProvider(create: (context) => AuthService(context)),
       ],
-      child: const TaxiChill(),
+      child: const TaxiKg(),
     ),
   );
 }
 
-class TaxiChill extends StatelessWidget {
-  const TaxiChill({super.key});
+class TaxiKg extends StatelessWidget {
+  const TaxiKg({super.key});
 
   @override
   Widget build(BuildContext context) {
-    logBuild('Запуск приложения TaxiChill');
+    logBuild('Запуск приложения TaxiKG');
 
     Map<String, Widget> onGenerateRoute = {
       '/home': const Home(),
@@ -85,23 +86,23 @@ ThemeData theme(BuildContext context) {
       suffixIconColor: Colors.white,
       filled: true,
       fillColor: Colors.grey[900],
-      enabledBorder: UnderlineInputBorder(
+      enabledBorder: CustomInputBorder(
         borderSide: const BorderSide(color: Colors.transparent),
         borderRadius: BorderRadius.circular(10),
       ),
-      border: UnderlineInputBorder(
+      border: CustomInputBorder(
         borderSide: const BorderSide(color: Colors.transparent),
         borderRadius: BorderRadius.circular(10),
       ),
-      focusedBorder: UnderlineInputBorder(
+      focusedBorder: CustomInputBorder(
         borderSide: BorderSide(color: Colors.yellow[700]!, width: 3),
         borderRadius: BorderRadius.circular(10),
       ),
-      errorBorder: UnderlineInputBorder(
+      errorBorder: CustomInputBorder(
         borderSide: BorderSide(color: Colors.red[700]!, width: 3),
         borderRadius: BorderRadius.circular(10),
       ),
-      focusedErrorBorder: UnderlineInputBorder(
+      focusedErrorBorder: CustomInputBorder(
         borderSide: BorderSide(color: Colors.red[700]!, width: 3),
         borderRadius: BorderRadius.circular(10),
       ),

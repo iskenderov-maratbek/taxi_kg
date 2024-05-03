@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:taxi_kg/views/misc/misc_methods.dart';
 
 class PageBuilder extends StatefulWidget {
@@ -17,7 +18,10 @@ class _PageBuilderState extends State<PageBuilder> {
     return PopScope(
       canPop: widget.canPop,
       child: GestureDetector(
-        onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
+        // onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
+        onTap: () {
+          SystemChannels.textInput.invokeMethod('TextInput.hide');
+        },
         child: Scaffold(
           body: Center(
             child: SingleChildScrollView(

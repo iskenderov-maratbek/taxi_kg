@@ -1,7 +1,7 @@
 import 'package:taxi_kg/views/misc/loader.dart';
 
 logInfo(value) {
-  print(value);
+  print('INFO: $value');
 }
 
 logBuild(value) {
