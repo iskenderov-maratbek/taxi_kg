@@ -15,20 +15,23 @@ dependencies:
     sdk: flutter
 
   cupertino_icons: ^1.0.2
-  provider: ^6.1.1
   google_fonts: ^6.1.0
   pinput: ^3.0.1
   # app_links: ^3.5.0
   http: ^1.2.1
   flutter_secure_storage: ^9.0.0
-  
+  flutter_riverpod: ^2.5.1
+  flutter_dotenv: ^5.1.0
+  tuple_dart: ^1.4.2
+  riverpod_annotation:
   
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
+  
   flutter_lints: ^2.0.0
-
+  build_runner:
+  riverpod_generator:
 flutter:
 
   uses-material-design: true

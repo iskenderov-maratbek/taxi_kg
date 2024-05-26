@@ -1,7 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:taxi_kg/views/misc/loader.dart';
+import 'package:taxi_kg/common/utils/app_colors.dart';
 import 'package:taxi_kg/views/misc/misc_methods.dart';
 
 class DialogForms {
@@ -23,9 +23,8 @@ class DialogForms {
           child: PopScope(
             canPop: false,
             child: AlertDialog(
-              backgroundColor: Colors.transparent,
-              surfaceTintColor: Colors.transparent,
-              title: icon,
+              backgroundColor: AppColors.transparent,
+              surfaceTintColor: AppColors.transparent,
               content: text,
               actions: [
                 ElevatedButton(
@@ -65,7 +64,7 @@ class DialogForms {
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
             child: Scaffold(
-              backgroundColor: Colors.black.withOpacity(0.7),
+              backgroundColor: AppColors.bgDialog,
               body: Center(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -81,7 +80,9 @@ class DialogForms {
         ),
       ),
     );
-    Overlay.of(context).insert(overlayEntry);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Overlay.of(context).insert(overlayEntry!);
+    });
   }
 
   static Future<void> showLoaderOverlay({
@@ -93,11 +94,9 @@ class DialogForms {
         alignment: Alignment.center,
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-          child: Scaffold(
-            backgroundColor: Colors.black.withOpacity(0.7),
-            body: const Center(
-              child: Loader(),
-            ),
+          child: const Scaffold(
+            backgroundColor: AppColors.bgDialog,
+            body: null,
           ),
         ),
       ),

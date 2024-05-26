@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:taxi_kg/views/misc/misc_methods.dart';
-import 'package:taxi_kg/services/auth_service.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -18,7 +16,7 @@ class _HomeState extends State<Home> {
       body: Center(
         child: IconButton(
           onPressed: () async {
-            await context.read<AuthService>().logout();
+            // await context.read<AuthService>().logout();
             if (mounted) {
               Navigator.pushNamedAndRemoveUntil(
                 context,

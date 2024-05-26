@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pinput/pinput.dart';
+import 'package:taxi_kg/common/utils/app_colors.dart';
 import 'package:taxi_kg/views/misc/misc_methods.dart';
 
 class PinCodeForm extends StatelessWidget {
@@ -9,41 +10,63 @@ class PinCodeForm extends StatelessWidget {
   final String? Function(String?) validator;
   final TextEditingController controller;
 
-  final double borderWidth = 3;
+  final double borderWidth = 2;
 
-  final defaultPinTheme = PinTheme(
-    width: 70,
+  final cursor = Column(
+    mainAxisAlignment: MainAxisAlignment.end,
+    children: [
+      Container(
+        width: 50,
+        height: 3,
+        decoration: BoxDecoration(
+          color: AppColors.yellow,
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
+    ],
+  );
+
+  final preFilledWidget = Column(
+    mainAxisAlignment: MainAxisAlignment.end,
+    children: [
+      Container(
+        width: 50,
+        height: 3,
+        decoration: BoxDecoration(
+          color: AppColors.secondaryWhite,
+          borderRadius: BorderRadius.circular(20),
+        ),
+      ),
+    ],
+  );
+  final defaultPinTheme = const PinTheme(
+    width: 50,
     height: 80,
-    textStyle: const TextStyle(
+    textStyle: TextStyle(
       fontSize: 30,
-      color: Colors.white,
-    ),
-    decoration: BoxDecoration(
-      color: Colors.grey,
-      border: Border.all(color: Colors.black, width: 2),
-      borderRadius: BorderRadius.circular(20),
+      color: AppColors.white,
     ),
   );
-  late final focusedPinTheme = defaultPinTheme.copyDecorationWith(
-    border: Border.all(
-      color: const Color(0xFFFBC02D),
-      width: borderWidth,
-    ),
-  );
+  // late final focusedPinTheme = defaultPinTheme.copyDecorationWith(
+  //   border: Border.all(
+  //     color: AppColors.yellow,
+  //     width: borderWidth,
+  //   ),
+  // );
 
-  late final errorPinTheme = defaultPinTheme.copyDecorationWith(
-    border: Border.all(
-      color: Colors.red,
-      width: borderWidth,
-    ),
-  );
+  // late final errorPinTheme = defaultPinTheme.copyDecorationWith(
+  //   border: Border.all(
+  //     color: const Color.fromRGBO(244, 67, 54, 1),
+  //     width: borderWidth,
+  //   ),
+  // );
 
-  late final submittedPinTheme = defaultPinTheme.copyDecorationWith(
-    border: Border.all(
-      color: const Color(0xFFFBC02D),
-      width: borderWidth,
-    ),
-  );
+  // late final submittedPinTheme = defaultPinTheme.copyDecorationWith(
+  //   border: Border.all(
+  //     color: const Color(0xFFFBC02D),
+  //     width: borderWidth,
+  //   ),
+  // );
 
   @override
   Widget build(BuildContext context) {
@@ -52,23 +75,23 @@ class PinCodeForm extends StatelessWidget {
       validator: validator,
       autofocus: true,
       controller: controller,
+      preFilledWidget: preFilledWidget,
       length: 4,
+      showCursor: true,
+      cursor: cursor,
       keyboardType: TextInputType.number,
       inputFormatters: <TextInputFormatter>[
         FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
         FilteringTextInputFormatter.digitsOnly
       ],
       pinputAutovalidateMode: PinputAutovalidateMode.disabled,
-      pinAnimationType: PinAnimationType.none,
+      pinAnimationType: PinAnimationType.fade,
       // separatorBuilder: (c) {
       //   return const SizedBox(width: 10);
       // },
       androidSmsAutofillMethod: AndroidSmsAutofillMethod.none,
       mainAxisAlignment: MainAxisAlignment.center,
       defaultPinTheme: defaultPinTheme,
-      focusedPinTheme: focusedPinTheme,
-      errorPinTheme: errorPinTheme,
-      submittedPinTheme: submittedPinTheme,
       closeKeyboardWhenCompleted: false,
     );
   }

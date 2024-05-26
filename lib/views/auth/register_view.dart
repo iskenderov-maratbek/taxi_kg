@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
-import 'package:taxi_kg/views/forms/segmented_form.dart';
-import 'package:taxi_kg/services/validator_service.dart';
-import 'package:taxi_kg/views/forms/text_field_form.dart';
-import 'package:taxi_kg/views/auth/pin_code_view.dart';
-import 'package:taxi_kg/views/misc/dialog_forms.dart';
+import 'package:taxi_kg/common/utils/app_colors.dart';
+import 'package:taxi_kg/common/widgets/text_field_widgets.dart';
+import 'package:taxi_kg/common/widgets/text_widgets.dart';
+import 'package:taxi_kg/common/widgets/button_widgets.dart';
+import 'package:taxi_kg/common/widgets/segmented_form.dart';
+import 'package:taxi_kg/views/auth/pinCodeDialog/pin_code_view.dart';
 import 'package:taxi_kg/views/misc/misc_methods.dart';
 import 'package:taxi_kg/views/view_builder.dart';
-import 'package:taxi_kg/services/auth_service.dart';
 
 class Register extends StatefulWidget {
   const Register({super.key});
@@ -18,90 +16,47 @@ class Register extends StatefulWidget {
 }
 
 class _RegisterState extends State<Register> {
-  final GlobalKey<FormState> _phoneNumberKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _numberKey = GlobalKey<FormState>();
   final GlobalKey<FormState> _emailKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _phoneNumberController = TextEditingController();
+  final TextEditingController _numberController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
-  late AuthService authService;
   late Map<int, String> tabItems;
   late List<Widget> items;
   int _segmentedIndex = 0;
   @override
   void initState() {
-    authService = Provider.of<AuthService>(context, listen: false);
-    tabItems = {
-      0: 'Почта',
-      1: 'Номер телефона',
-    };
+    tabItems = {0: 'Почта', 1: 'Номер'};
     items = [
-      Form(
-        key: _emailKey,
-        child: TextFieldForm(
-          maxLength: 320,
-          prefixIcon: Icons.email_rounded,
-          hintText: 'example@example.com',
-          keyboardType: TextInputType.emailAddress,
-          validator: Validators.email,
-          controller: _emailController,
-        ),
-      ),
-      Form(
-        key: _phoneNumberKey,
-        child: TextFieldForm(
-          maxLength: 10,
-          prefixIcon: Icons.dialpad_rounded,
-          hintText: '0553998299',
-          keyboardType: TextInputType.number,
-          inputFormatters: [
-            FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
-            FilteringTextInputFormatter.digitsOnly,
-          ],
-          validator: Validators.phoneNumber,
-          controller: _phoneNumberController,
-        ),
-      )
+      Form(key: _emailKey, child: emailTextField(_emailController)),
+      Form(key: _numberKey, child: numberTextField(_numberController))
     ];
     super.initState();
   }
 
-  _selectedIndex(int? index) {
-    _segmentedIndex = index!;
+  void _selectedIndex(int? index) {
+    _segmentedIndex = index ?? 0;
   }
 
   @override
   void dispose() {
     logDispose('Register');
     _emailController.dispose();
-    _phoneNumberController.dispose();
+    _numberController.dispose();
     super.dispose();
   }
 
   register() async {
+    logInfo('Выбранное меню: $_segmentedIndex');
     switch (_segmentedIndex) {
       case 0:
-        logInfo('Selected index SEGMENTED_MENU: $_segmentedIndex');
-        DialogForms.showLoaderOverlay(
-            context: context,
-            run: () async {
-              if (_emailKey.currentState!.validate() && mounted) {
-                await authService.register(
-                            email: _emailController.text,
-                            username: _usernameController.text) &&
-                        mounted
-                    ? Navigator.pushNamedAndRemoveUntil(
-                        context,
-                        '/home',
-                        (Route<dynamic> route) => false,
-                      )
-                    : logError('Неправильный адрес');
-              } else {
-                logError('Некорректный адрес');
-              }
-            });
+        _emailKey.currentState!.validate()
+            ? showPinCodeDialog(context, _emailController.text)
+            : null;
       case 1:
-        await showPinCodeDialog(context);
-      default:
+        _numberKey.currentState!.validate()
+            ? showPinCodeDialog(context, _numberController.text)
+            : null;
     }
   }
 
@@ -113,63 +68,26 @@ class _RegisterState extends State<Register> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Text(
-            'Регистрация',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 30,
-            ),
-          ),
+          primaryText('Регистрация'),
           const SizedBox(height: 20),
           SegmentedForm(
-            sizedBox: 5,
-            tabItems: tabItems,
-            items: items,
-            selectedIndex: _selectedIndex,
-          ),
+              sizedBox: 5, tabItems: tabItems, items: items, selectedIndex: _selectedIndex),
           const SizedBox(height: 10),
-          TextFieldForm(
-            validator: Validators.username,
-            controller: _usernameController,
-            prefixIcon: Icons.person_rounded,
-            maxLength: 32,
-            hintText: 'Как к вам обращаться?',
-            keyboardType: TextInputType.name,
-          ),
+          usernameTextField(_usernameController),
           const SizedBox(height: 20),
-          ElevatedButton(
+          primaryButton(
+            'Далее',
             onPressed: register,
-            child: const Text(
-              'Завершить регистрацию',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 20),
-            ),
           ),
           const SizedBox(height: 10),
           Wrap(
             alignment: WrapAlignment.center,
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              const Text(
-                'Уже есть аккаунт? ',
-                style: TextStyle(fontSize: 18),
-              ),
-              TextButton(
-                style: ButtonStyle(
-                  overlayColor: MaterialStateProperty.all<Color>(
-                      Colors.yellow[700]!.withOpacity(0.3)),
-                ),
-                onPressed: () {
-                  DialogForms.showLoaderOverlay(
-                      context: context,
-                      run: () {
-                        Navigator.pop(context, '/auth');
-                      });
-                },
-                child: Text(
-                  'Войти',
-                  style: TextStyle(fontSize: 20, color: Colors.yellow[700]),
-                ),
+              secondaryText('Уже есть аккаунт?', color: AppColors.white),
+              secondaryButton(
+                'Войти',
+                onPressed: () => Navigator.pop(context, '/auth'),
               ),
             ],
           ),

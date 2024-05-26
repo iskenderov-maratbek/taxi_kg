@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:taxi_kg/views/misc/misc_methods.dart';
+import 'package:taxi_kg/common/utils/app_colors.dart';
 
 class TextFieldForm extends StatelessWidget {
   final String? Function(String?) validator;
@@ -26,18 +26,13 @@ class TextFieldForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    logBuild('Модель текстового поля');
     return TextFormField(
       validator: validator,
       keyboardType: keyboardType,
       controller: controller,
       maxLength: maxLength,
-      // textAlignVertical: TextAlignVertical.center,
       style: const TextStyle(
         fontSize: 18,
-        // height: 1,
-        // height: 1.5170817,
-        // height: 1.50825,
       ),
       inputFormatters: inputFormatters,
       decoration: InputDecoration(
@@ -50,20 +45,19 @@ class TextFieldForm extends StatelessWidget {
               padding: const EdgeInsets.only(left: 18, right: 5),
               child: Icon(
                 prefixIcon,
-                color: Colors.yellow[700],
+                color: AppColors.yellow,
                 size: 25,
               ),
             ),
           ],
         ),
-        errorStyle: const TextStyle(color: Colors.red),
+        errorStyle: const TextStyle(color: AppColors.error),
         errorMaxLines: 2,
         counterText: '',
         hintText: hintText,
         hintStyle: const TextStyle(
-          color: Colors.grey,
+          color: AppColors.grey,
           fontSize: 18,
-          // height: 1.6352,
         ),
       ),
     );

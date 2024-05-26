@@ -10,9 +10,7 @@ class Validators {
   static String? email(String? value) {
     logInfo('Валидация почты: $value');
     if (value != null) {
-      var i = 0;
       for (var check in emailRules.values) {
-        print(i);
         if (!check(value)) {
           logError('Некорректная почта: $value');
           return ' Неправильный почтовый адрес';
@@ -28,5 +26,16 @@ class Validators {
   static String? username(String? value) {
     logInfo('Валидация имени пользователя: $value');
     return null;
+  }
+
+  static String? pinCode(String? value) {
+    if (value != null && value.isNotEmpty && value.length == 4) {
+      if (value.length == 4) {
+        return null;
+      } else {
+        return 'Заполните поле!';
+      }
+    }
+    return 'Заполните поле!';
   }
 }

@@ -1,5 +1,3 @@
-import 'package:taxi_kg/views/misc/loader.dart';
-
 logInfo(value) {
   print('INFO: $value');
 }
@@ -22,7 +20,7 @@ logError(value) {
 
 clickLoader({required Function setState, required Function run}) {
   setState();
-  const Loader();
+  // const Loader();
   run();
 }
 

@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:taxi_kg/views/misc/custom_input_border.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:taxi_kg/common/utils/app_theme.dart';
+import 'package:taxi_kg/providers/provider_logger.dart';
 import 'package:taxi_kg/views/misc/custom_transition.dart';
-import 'package:taxi_kg/views/auth/auth_view.dart';
+import 'package:taxi_kg/views/auth/authPage/auth_view.dart';
 import 'package:taxi_kg/views/auth/register_view.dart';
 import 'package:taxi_kg/views/home/home.dart';
 import 'package:taxi_kg/views/misc/misc_methods.dart';
-import 'package:taxi_kg/services/auth_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (context) => AuthService(context)),
+    ProviderScope(
+      observers: [
+        ProviderLogger(),
       ],
       child: const TaxiKg(),
     ),
@@ -29,7 +29,7 @@ class TaxiKg extends StatelessWidget {
 
     Map<String, Widget> onGenerateRoute = {
       '/home': const Home(),
-      '/auth': const Auth(),
+      '/auth': const AuthView(),
       '/register': const Register(),
     };
     return MaterialApp(
@@ -40,138 +40,8 @@ class TaxiKg extends StatelessWidget {
       },
       debugShowCheckedModeBanner: false,
       title: 'TaxiKG',
-      theme: theme(context),
-      home:
-          context.read<AuthService>().checkAuth() ? const Home() : const Auth(),
+      theme: AppTheme.appThemeData(),
+      home: const AuthView(),
     );
   }
-}
-
-ThemeData theme(BuildContext context) {
-  return ThemeData(
-    fontFamily: 'MiSans',
-    pageTransitionsTheme: PageTransitionsTheme(
-      builders: {
-        TargetPlatform.android: CustomTransition(),
-        TargetPlatform.iOS: CustomTransition(),
-        TargetPlatform.macOS: CustomTransition(),
-        TargetPlatform.windows: CustomTransition(),
-      },
-    ),
-    segmentedButtonTheme: SegmentedButtonThemeData(
-        style: ButtonStyle(
-      backgroundColor: MaterialStateProperty.all<Color>(Colors.transparent),
-      foregroundColor:
-          MaterialStateProperty.all<Color>(const Color(0xFFFBC02D)),
-    )),
-    appBarTheme: const AppBarTheme(backgroundColor: Colors.transparent),
-    textButtonTheme: TextButtonThemeData(
-      style: ButtonStyle(
-        backgroundColor: MaterialStateProperty.all<Color>(Colors.transparent),
-      ),
-    ),
-    textSelectionTheme: TextSelectionThemeData(
-      cursorColor: Colors.yellow[700],
-      selectionColor: Colors.blue,
-      selectionHandleColor: Colors.yellow[700],
-    ),
-    scaffoldBackgroundColor: Colors.black,
-    inputDecorationTheme: InputDecorationTheme(
-      contentPadding: const EdgeInsets.all(18),
-      prefixStyle: const TextStyle(
-        color: Colors.white,
-        fontSize: 20,
-      ),
-      hintStyle: const TextStyle(color: Colors.grey),
-      suffixIconColor: Colors.white,
-      filled: true,
-      fillColor: Colors.grey[900],
-      enabledBorder: CustomInputBorder(
-        borderSide: const BorderSide(color: Colors.transparent),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      border: CustomInputBorder(
-        borderSide: const BorderSide(color: Colors.transparent),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      focusedBorder: CustomInputBorder(
-        borderSide: BorderSide(color: Colors.yellow[700]!, width: 3),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      errorBorder: CustomInputBorder(
-        borderSide: BorderSide(color: Colors.red[700]!, width: 3),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      focusedErrorBorder: CustomInputBorder(
-        borderSide: BorderSide(color: Colors.red[700]!, width: 3),
-        borderRadius: BorderRadius.circular(10),
-      ),
-    ),
-    elevatedButtonTheme: ElevatedButtonThemeData(
-      style: ElevatedButton.styleFrom(
-        minimumSize: const Size(50, 70),
-        backgroundColor: Colors.yellow[700],
-        foregroundColor: Colors.black,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(10)),
-        ),
-      ),
-    ),
-    iconButtonTheme: IconButtonThemeData(
-      style: ButtonStyle(
-        iconColor: MaterialStateProperty.all<Color>(const Color(0xFFFBC02D)),
-        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-          RoundedRectangleBorder(
-            side: const BorderSide(color: Color(0xFFFBC02D)),
-            borderRadius: BorderRadius.circular(10),
-          ),
-        ),
-        backgroundColor:
-            MaterialStateProperty.resolveWith((Set<MaterialState> state) {
-          if (state.contains(MaterialState.pressed)) {
-            return Colors.grey[700];
-          } else if (state.contains(MaterialState.selected)) {
-            return Colors.black;
-          }
-          return Colors.black;
-        }),
-      ),
-    ),
-    dialogTheme: const DialogTheme(
-      backgroundColor: Colors.black,
-      surfaceTintColor: Colors.transparent,
-    ),
-    textTheme: const TextTheme(
-      titleLarge: TextStyle(
-        color: Colors.white,
-        fontSize: 20,
-        fontWeight: FontWeight.w600,
-      ),
-      bodyLarge: TextStyle(
-        color: Colors.white,
-        fontSize: 16,
-        fontWeight: FontWeight.w400,
-      ),
-      bodyMedium: TextStyle(
-        color: Colors.white,
-        fontSize: 14,
-        fontWeight: FontWeight.w400,
-      ),
-      labelLarge: TextStyle(
-        color: Colors.white,
-        fontSize: 14,
-        fontWeight: FontWeight.w400,
-      ),
-      bodySmall: TextStyle(
-        color: Colors.white,
-        fontSize: 12,
-        fontWeight: FontWeight.w400,
-      ),
-      labelSmall: TextStyle(
-        color: Colors.white,
-        fontSize: 10,
-        fontWeight: FontWeight.w400,
-      ),
-    ),
-  );
 }
