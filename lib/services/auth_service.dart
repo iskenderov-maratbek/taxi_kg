@@ -1,69 +1,176 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'dart:ffi';
+import 'package:dio/dio.dart';
 import 'package:taxi_kg/models/user.dart';
+import 'package:taxi_kg/providers/providers.dart';
 import 'package:taxi_kg/views/misc/misc_methods.dart';
 
 enum AuthState {
   loading,
   notFound,
   error,
-  errorNotRecognized,
-  sendCode,
-  success,
-  sendVerifyLink,
+  // invalidErrorCode,
+  sendCodeEmail,
+  // sendCodePhone,
+  // sendVerifyLink,
+  // autoSendCooldown,
 }
 
+enum AuthMethod {
+  email,
+  phone,
+  none,
+}
+
+enum TimerState {
+  run,
+  cooldown,
+}
+
+String socket = 'http://192.168.8.100:3000';
+
 class AuthService {
-  AuthService(authState) {
-    _authState.add(authState);
+  final dio = Dio();
+  final Map<AuthMethod, String> _selectedMethod = {
+    for (var value in AuthMethod.values) value: value.toString().split('.')[1]
+  };
+  final Map<AuthMethod, String?> _userdata = {for (var value in AuthMethod.values) value: null};
+  final _authMethod;
+  AuthService() {
+    
+    _authState.add(AuthState.loading);
+    // _authMethod.add(AuthMethod.none);
+    dio.options.validateStatus = (status) {
+      return status == 200;
+    };
   }
 
-  final Map<int, AuthState> _errorCodes = {
-    404: AuthState.notFound,
-    200: AuthState.sendCode,
-  };
+  final _timerState = StreamController<TimerState>();
+  Stream<TimerState> timerStateChanges() => _timerState.stream;
 
   final _authState = StreamController<AuthState>();
   Stream<AuthState> authStateChanges() => _authState.stream;
 
-  Future<void> sendCode({required String number}) async {
+  Future<void> sendCode({required String userdata, bool isPhone = false}) async {
+    _authState.add(AuthState.loading);
     try {
-      final response = await http.post(
-        getRoute('/send-code-to-number'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode(<String, dynamic>{
-          'number': number,
+      dio.options.headers['Authorization'] = 'Bearer JWT_TOKEN}';
+      logServer('Start request to send confirm-code-email');
+      await dio.post(
+        '$socket/send-code',
+        data: jsonEncode(<String, dynamic>{
+          isPhone ? 'phone' : 'email': userdata,
+           _selectedMethod[_authMethod]!: ,
         }),
       );
-      _errorCodes.keys.contains(response.statusCode)
-          ? _authState.add(_errorCodes[response.statusCode] ?? AuthState.errorNotRecognized)
-          : _authState.add(AuthState.error);
-    } catch (e) {
-      _authState.add(AuthState.errorNotRecognized);
+      _authState.add(AuthState.sendCodeEmail);
+      _timerState.add(TimerState.run);
+      isPhone ? _phone = userdata : _email = userdata;
+    } on DioException catch (e) {
+      switch (e.response?.statusCode) {
+        case 404:
+          _authState.add(AuthState.notFound);
+          break;
+        case 422:
+          _timerState.add(TimerState.cooldown);
+          _authState.add(AuthState.sendCodeEmail);
+          Future.delayed(const Duration(seconds: 3), () {
+            _timerState.add(TimerState.run);
+          });
+          break;
+        default:
+          _authState.add(AuthState.error);
+          break;
+      }
     }
   }
 
-  Future<void> sendVerifyLink() async {
-    _authState.add(AuthState.sendVerifyLink);
+  reSendCode() async {
+    try {
+      dio.options.headers['Authorization'] = 'Bearer JWT_TOKEN}';
+      logServer('Start request to send confirm-code-email');
+      if (_userdata[_authMethod] != null) {
+        await dio.post(
+          '$socket/send-code-email',
+          data: jsonEncode(<String, dynamic>{
+            _selectedMethod[_authMethod]!: _userdata[_authMethod],
+          }),
+        );
+      } else {
+        throw Exception('No userdata');
+      }
+
+      _authState.add(AuthState.sendCodeEmail);
+      _timerState.add(TimerState.run);
+    } on DioException catch (e) {
+      switch (e.response?.statusCode) {
+        case 404:
+          _authState.add(AuthState.notFound);
+          break;
+        case 422:
+          _timerState.add(TimerState.cooldown);
+          _authState.add(AuthState.sendCodeEmail);
+          Future.delayed(const Duration(seconds: 3), () {
+            _timerState.add(TimerState.run);
+          });
+          break;
+        default:
+          _authState.add(AuthState.error);
+          break;
+      }
+    }
   }
 
-  Future<dynamic> loginWithEmail({required String email, required String code}) async {
+  // Future<void> sendVerifyLink() async {
+  //   _authState.add(AuthState.sendVerifyLink);
+  // }
+
+  // Future<dynamic> loginWithEmail({required String email, required String code}) async {
+  //   try {
+  //     var response = await http.post(
+  //       getRoute('/login-with-email'),
+  //       headers: <String, String>{
+  //         'Content-Type': 'application/json; charset=UTF-8',
+  //       },
+  //       body: jsonEncode(<String, dynamic>{
+  //         'email': email,
+  //       }),
+  //     );
+  //     return response.statusCode == 200 ? User(email: response.body) : response.body;
+  //   } catch (e) {6
+  //     return null;
+  //   }
+  // }
+  Future<dynamic> auth({required String code}) async {
     try {
-      var response = await http.post(
-        getRoute('/login-with-email'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode(<String, dynamic>{
-          'email': email,
+      _authState.add(AuthState.loading);
+      // dio.options.headers['Authorization'] = 'Bearer JWT_TOKEN}';
+      logServer('Start request to send confirm-code');
+      await dio.post(
+        '$socket/confirm-code',
+        data: jsonEncode(<String, dynamic>{
+          'email': _email,
+          'code': code,
         }),
       );
-      return response.statusCode == 200 ? User(email: response.body) : response.body;
-    } catch (e) {
-      return null;
+      User(email: _email!);
+    } on DioException catch (e) {
+      switch (e.response?.statusCode) {
+        case 404:
+          _authState.add(AuthState.notFound);
+          break;
+        case 422:
+          _timerState.add(TimerState.cooldown);
+          _authState.add(AuthState.sendCodeEmail);
+          Future.delayed(const Duration(seconds: 3), () {
+            _timerState.add(TimerState.run);
+          });
+          break;
+        default:
+          _authState.add(AuthState.error);
+          break;
+      }
     }
   }
 
@@ -138,5 +245,8 @@ class AuthService {
   // Future<bool> logout() async {
   //   return true;
   // }
-  void dispose() => _authState.close();
+  void dispose() {
+    _authState.close();
+    _timerState.close();
+  }
 }

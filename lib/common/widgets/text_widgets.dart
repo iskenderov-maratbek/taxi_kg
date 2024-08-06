@@ -22,13 +22,15 @@ Widget primaryText(
 Widget secondaryText(
   String text, {
   Color color = AppColors.yellow,
+  int maxLines=1,
   TextOverflow? overflow = TextOverflow.ellipsis,
-  double? fontSize = 20,
+  double? fontSize = 18,
   FontWeight? fontWeight = FontWeight.normal,
 }) =>
     Text(
       text,
       overflow: overflow,
+      maxLines: maxLines,
       textAlign: TextAlign.center,
       style: TextStyle(
         color: color,

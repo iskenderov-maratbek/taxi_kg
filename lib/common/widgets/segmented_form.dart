@@ -55,12 +55,14 @@ class _SegmentedFormState extends State<SegmentedForm> {
           children: newTabItems,
           groupValue: _sliding,
           onValueChanged: (isTapped) {
-            setState(
-              () {
-                _sliding = isTapped;
-                widget.selectedIndex(isTapped);
-              },
-            );
+            Future.delayed(const Duration(milliseconds: 100), () {
+              setState(
+                () {
+                  _sliding = isTapped;
+                  widget.selectedIndex(isTapped);
+                },
+              );
+            });
           },
         ),
         SizedBox(height: widget.sizedBox),

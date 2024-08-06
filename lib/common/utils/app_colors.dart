@@ -1,4 +1,5 @@
-import 'dart:ui';
+
+import 'package:flutter/material.dart';
 
 class AppColors {
   static const Color black = Color.fromARGB(255, 0, 0, 0);
@@ -10,6 +11,7 @@ class AppColors {
 
   /// main widget color blue
   static const Color bgDialog = Color(0xFF111111);
+  static const Color blue = Color.fromARGB(255, 33, 150, 243);
 
   /// main text color black
   static const Color primaryText = Color.fromARGB(255, 255, 255, 255);

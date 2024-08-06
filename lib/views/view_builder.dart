@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:taxi_kg/views/misc/misc_methods.dart';
 
 class PageBuilder extends StatefulWidget {
-  const PageBuilder({super.key, required this.child, this.canPop = true});
+  const PageBuilder({super.key, required this.child, this.canPop = true,autoscroll=true});
 
   @override
   State<PageBuilder> createState() => _PageBuilderState();
@@ -23,11 +23,11 @@ class _PageBuilderState extends State<PageBuilder> {
           SystemChannels.textInput.invokeMethod('TextInput.hide');
         },
         child: Scaffold(
+          resizeToAvoidBottomInset: false,
           body: Center(
             child: SingleChildScrollView(
               child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+                padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
                 child: widget.child,
               ),
             ),

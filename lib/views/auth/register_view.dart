@@ -1,21 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:taxi_kg/common/utils/app_colors.dart';
 import 'package:taxi_kg/common/widgets/text_field_widgets.dart';
 import 'package:taxi_kg/common/widgets/text_widgets.dart';
 import 'package:taxi_kg/common/widgets/button_widgets.dart';
 import 'package:taxi_kg/common/widgets/segmented_form.dart';
-import 'package:taxi_kg/views/auth/pinCodeDialog/pin_code_view.dart';
+import 'package:taxi_kg/providers/providers.dart';
 import 'package:taxi_kg/views/misc/misc_methods.dart';
 import 'package:taxi_kg/views/view_builder.dart';
 
-class Register extends StatefulWidget {
-  const Register({super.key});
+class RegisterView extends ConsumerStatefulWidget {
+  const RegisterView({super.key});
 
   @override
-  State<Register> createState() => _RegisterState();
+  ConsumerState<RegisterView> createState() => _RegisterState();
 }
 
-class _RegisterState extends State<Register> {
+class _RegisterState extends ConsumerState<RegisterView> {
   final GlobalKey<FormState> _numberKey = GlobalKey<FormState>();
   final GlobalKey<FormState> _emailKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
@@ -50,13 +51,18 @@ class _RegisterState extends State<Register> {
     logInfo('Выбранное меню: $_segmentedIndex');
     switch (_segmentedIndex) {
       case 0:
-        _emailKey.currentState!.validate()
-            ? showPinCodeDialog(context, _emailController.text)
-            : null;
+        if (_emailKey.currentState!.validate()) {
+          ref.read(authServiceProvider).sendCode(email: _emailController.text);
+        }
       case 1:
-        _numberKey.currentState!.validate()
-            ? showPinCodeDialog(context, _numberController.text)
-            : null;
+        if (_numberKey.currentState!.validate()) {
+          // Navigator.push(
+          //   context,
+          //   CustomRoute(
+          //       builder: (BuildContext context) =>
+          //           PinCodeView(userdata: _emailController.text, isNumber: true)),
+          // );
+        }
     }
   }
 
